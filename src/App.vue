@@ -8,7 +8,7 @@ const newItem = ref<string>("");
 const newItemHighPriority = ref<boolean>(false);
 
 const handleSubmit = () => {
-  if (newItem.value === "" || !newItemHighPriority.value) {
+  if (newItem.value === "") {
     return alert("Please fill out all fields");
   }
 
@@ -16,6 +16,7 @@ const handleSubmit = () => {
     id: items.length + 1,
     label: newItem.value,
     priority: newItemHighPriority.value,
+    purchased: false,
   });
 
   newItem.value = "";
@@ -25,6 +26,10 @@ const handleSubmit = () => {
 const doEdit = (e: Event) => {
   editing.value = e;
   newItem.value = "";
+};
+
+const togglePurchased = (item) => {
+  item.purchased = !item.purchased;
 };
 </script>
 
@@ -53,7 +58,15 @@ const doEdit = (e: Event) => {
   </form>
 
   <ul>
-    <li v-for="{ id, label } in items" :key="id">{{ label }}</li>
+    <li
+      v-for="item in items"
+      class="static-class"
+      @click="togglePurchased(item)"
+      :class="{ strikeout: item.purchased, priority: item.priority }"
+      :key="item.id"
+    >
+      {{ item.label }}
+    </li>
   </ul>
 
   <p v-if="!items.length">Nothing to see here</p>
