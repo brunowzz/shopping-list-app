@@ -2,11 +2,8 @@
 import { ref } from "vue";
 
 const header = ref<string>("Shopping List App");
-const items = ref([
-  { id: 1, label: "10 Party hats", priority: false },
-  { id: 2, label: "2 board games", priority: false },
-  { id: 3, label: "1 bag of chips", priority: false },
-]);
+const editing = ref<boolean>(false);
+const items = ref([]);
 const newItem = ref<string>("");
 const newItemHighPriority = ref<boolean>(false);
 
@@ -24,21 +21,40 @@ const handleSubmit = () => {
   newItem.value = "";
   newItemHighPriority.value = false;
 };
+
+const doEdit = (e: Event) => {
+  editing.value = e;
+  newItem.value = "";
+};
 </script>
 
 <template>
-  <h1>{{ header }}</h1>
+  <div class="header">
+    <h1>{{ header }}</h1>
+    <button v-if="editing" class="btn" @click="doEdit(false)">Cancel</button>
+    <button v-else class="btn btn-primary" @click="doEdit(true)">
+      Add Item
+    </button>
+  </div>
 
-  <form class="add-item-form" @submit.prevent="handleSubmit()">
+  <form class="add-item-form" v-if="editing" @submit.prevent="handleSubmit()">
     <input type="text" placeholder="Add an item" v-model="newItem" />
     <label>
       <input type="checkbox" name="priority" v-model="newItemHighPriority" />
       High Prority
     </label>
-    <button class="btn btn-primary" type="submit">Add an item</button>
+    <button
+      :disabled="newItem.length < 3"
+      type="submit"
+      class="btn btn-primary"
+    >
+      Add an item
+    </button>
   </form>
 
   <ul>
     <li v-for="{ id, label } in items" :key="id">{{ label }}</li>
   </ul>
+
+  <p v-if="!items.length">Nothing to see here</p>
 </template>
