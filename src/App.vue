@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
+
+interface ItemsProps {
+  id: number;
+  label: string;
+  priority: boolean;
+  purchased: boolean;
+}
 
 const header = ref<string>("Shopping List App");
 const editing = ref<boolean>(false);
-const items = ref([]);
+const items = ref<ItemsProps[]>([]);
 const newItem = ref<string>("");
 const newItemHighPriority = ref<boolean>(false);
 
@@ -12,8 +19,8 @@ const handleSubmit = () => {
     return alert("Please fill out all fields");
   }
 
-  const newItemPush = items.value.push({
-    id: items.length + 1,
+  items.value.push({
+    id: items.value.length + 1,
     label: newItem.value,
     priority: newItemHighPriority.value,
     purchased: false,
@@ -23,14 +30,16 @@ const handleSubmit = () => {
   newItemHighPriority.value = false;
 };
 
-const doEdit = (e: Event) => {
+const doEdit = (e: boolean) => {
   editing.value = e;
   newItem.value = "";
 };
 
-const togglePurchased = (item) => {
+const togglePurchased = (item: ItemsProps) => {
   item.purchased = !item.purchased;
 };
+
+const reversedItems = computed(() => [...items.value].reverse());
 </script>
 
 <template>
@@ -59,7 +68,7 @@ const togglePurchased = (item) => {
 
   <ul>
     <li
-      v-for="item in items"
+      v-for="item in reversedItems"
       class="static-class"
       @click="togglePurchased(item)"
       :class="{ strikeout: item.purchased, priority: item.priority }"
